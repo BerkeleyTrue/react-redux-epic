@@ -1,0 +1,23 @@
+{
+    "presets": [
+        "es2015",
+        "react"
+    ],
+    "plugins": [
+        [
+            "transform-function-bind",
+            "transform-runtime",
+            {
+                "helpers": true,
+                "polyfill": false,
+                "regenerator": false
+            }
+        ],
+        "dev-expression"
+    ],
+    "env": {
+        "test": {
+            "plugins": ["istanbul"]
+        }
+    }
+}
