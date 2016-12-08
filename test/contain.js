@@ -3,7 +3,7 @@ import test from 'ava';
 import sinon from 'sinon';
 import React from 'react';
 import { shallow } from 'enzyme';
-import { contain } from '../src';
+import contain from '../src/contain.js';
 
 test('contain', t => {
   t.is(
