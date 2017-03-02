@@ -23,7 +23,7 @@ export default function wrapRootEpic(rootEpic) {
       const epicsSubscription = rootEpic(actionsProxy, ...rest)
         .subscribe(
           action => results.next(action),
-          err => { throw err; },
+          err => lifecycle.error(err),
           () => lifecycle.complete()
         );
 
