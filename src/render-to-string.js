@@ -11,10 +11,10 @@ const log = debug('react-redux-epic:render-to-string');
 //   epicMiddleware: EpicMiddleware
 // ) => Observable[String]
 
-export default function renderToString(Component, wrappedEpic) {
+export default function renderToString(element, wrappedEpic) {
   try {
     log('initial render pass started');
-    ReactDOM.renderToStaticMarkup(Component);
+    ReactDOM.renderToStaticMarkup(element);
     log('initial render pass completed');
   } catch (e) {
     return Observable.throw(e);
@@ -25,7 +25,7 @@ export default function renderToString(Component, wrappedEpic) {
     ::last(null, null, null)
     ::map(() => {
       wrappedEpic.restart();
-      const markup = ReactDOM.renderToString(Component);
+      const markup = ReactDOM.renderToString(element);
       return { markup };
     });
 }
