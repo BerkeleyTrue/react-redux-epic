@@ -8,7 +8,9 @@
     "test:watch": "ava --watch",
     "lint": "eslint src test",
     "cover": "nyc report --reporter=html",
+    "postcover": "npm run view-coverage",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "view-coverage": "open coverage/index.html",
     "build": "BABEL_ENV=production babel src --out-dir lib",
     "prepublish": "npm run lint && npm run test && npm run build"
   },
