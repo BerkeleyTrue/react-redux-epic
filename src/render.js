@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import { render as _render, unmountComponentAtNode } from 'react-dom';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs/Subscription';
 export default function render(Component, DOMContainer) {
   return Observable.create(observer => {
     try {
-      ReactDOM.render(Component, DOMContainer, function() {
+      _render(Component, DOMContainer, function() {
         observer.next(this);
       });
     } catch (e) {
@@ -18,7 +18,7 @@ export default function render(Component, DOMContainer) {
     }
 
     return new Subscription(() => {
-      return ReactDOM.unmountComponentAtNode(DOMContainer);
+      return unmountComponentAtNode(DOMContainer);
     });
   });
 }
