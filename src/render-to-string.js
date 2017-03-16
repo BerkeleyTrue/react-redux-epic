@@ -6,10 +6,10 @@ import debug from 'debug';
 import { Observable } from 'rxjs/Observable';
 
 import {
+  $$complete,
   $$getObservable,
-  $$end,
-  $$restart,
-  $$isWrapped
+  $$isWrapped,
+  $$unsubscribe
 } from './symbols.js';
 
 const log = debug('react-redux-epic:render-to-string');
@@ -19,35 +19,35 @@ const log = debug('react-redux-epic:render-to-string');
 //   epicMiddleware: EpicMiddleware
 // ) => Observable[String]
 export default function renderToString(element, wrappedEpic) {
-  invariant(
-    isValidElement(element),
-    `renderToString expects a valid react element bot got %s.
-    Make sure you are passing in an element and not a component.
-    Happy Coding.
-  `);
-  invariant(
-    wrappedEpic && wrappedEpic[$$isWrapped],
-    `renderToString expects a wrapped root epic but got %s.
-    Make sure you wrap your root epic
-    'const wrappedEpic = wrapRootEpic(rootEpic);'
-    and use this wrapped epic in your createEpicMiddleware call
-    'const epicMiddleware = createEpicMiddleware(wrappedEpic);'
-    Happy Coding.
-  `);
   function initialRender() {
+    invariant(
+      isValidElement(element),
+      `renderToString expects a valid react element bot got %s.
+      Make sure you are passing in an element and not a component.
+      Happy Coding.`
+    );
+    invariant(
+      wrappedEpic && wrappedEpic[$$isWrapped],
+      `renderToString expects a wrapped root epic but got %s.
+      Make sure you wrap your root epic
+      'const wrappedEpic = wrapRootEpic(rootEpic);'
+      and use this wrapped epic in your createEpicMiddleware call
+      'const epicMiddleware = createEpicMiddleware(wrappedEpic);'
+      Happy Coding.`
+    );
     try {
       log('first app render');
       ReactDOM.renderToStaticMarkup(element);
     } catch (e) {
       return Observable.throw(e);
     }
-    wrappedEpic[$$end]();
+    wrappedEpic[$$complete]();
     return wrappedEpic[$$getObservable]();
   }
   return Observable.defer(initialRender)
     .last(null, null, null)
     .map(() => {
-      wrappedEpic[$$restart]();
+      wrappedEpic[$$unsubscribe]();
       log('final app render');
       const markup = ReactDOM.renderToString(element);
       return { markup };

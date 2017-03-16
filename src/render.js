@@ -1,24 +1,21 @@
 import { render as _render, unmountComponentAtNode } from 'react-dom';
 import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
 
 // render(
-//   Component: ReactComponent,
-//   DomContainer: DOMNode
+//   element: ReactElement,
+//   container: DOMElement,
 // ) => Observable[RootInstance]
 
-export default function render(Component, DOMContainer) {
+export default function render(element, container) {
   return Observable.create(observer => {
     try {
-      _render(Component, DOMContainer, function() {
+      _render(element, container, function() {
         observer.next(this);
       });
     } catch (e) {
       return observer.error(e);
     }
 
-    return new Subscription(() => {
-      return unmountComponentAtNode(DOMContainer);
-    });
+    return () => unmountComponentAtNode(container);
   });
 }

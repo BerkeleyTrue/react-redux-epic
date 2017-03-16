@@ -4,13 +4,14 @@ import { EmptyObservable } from 'rxjs/observable/EmptyObservable';
 import { Subject } from 'rxjs/Subject';
 import { Subscriber } from 'rxjs/Subscriber';
 import { EPIC_END } from 'redux-observable/lib/EPIC_END';
+import { ActionsObservable } from 'redux-observable/lib/ActionsObservable.js';
 import debug from 'debug';
 
 import {
+  $$complete,
   $$getObservable,
-  $$end,
-  $$restart,
-  $$isWrapped
+  $$isWrapped,
+  $$unsubscribe
 } from './symbols.js';
 
 const endAction = { type: EPIC_END };
@@ -22,57 +23,48 @@ export default function wrapRootEpic(userEpic) {
     'wrapRootEpic expects a function but got %. Happy Coding.',
     userEpic
   );
-  let actionsProxy = EmptyObservable.create();
+  let actionsProxy = new Subject();
   let lifecycle = EmptyObservable.create();
   let subscription;
-  let start;
-  let name = `observable(${userEpic.name || 'rootEpic'})`;
-  function observableEpic(actions, ...rest) {
-    const results = new Subject();
-    start = () => {
-      subscription = new Subscriber();
-      actionsProxy = new Subject();
-      // how can we make Subject inherit from the ActionsObservable?
-      actionsProxy.ofType = actions.ofType;
-      lifecycle = new Subject();
-      const actionsSubscription = actions.subscribe(actionsProxy);
-      const epicsSubscription = userEpic(actionsProxy, ...rest)
-        .subscribe(
-          action => results.next(action),
-          err => results.error(err),
-          () => {
-            lifecycle.complete();
-            results.complete();
-          }
-        );
+  function observableEpic(_actions, ...rest) {
+    actionsProxy = new Subject();
+    subscription = new Subscriber();
+    lifecycle = new Subject();
 
-      subscription.add(epicsSubscription);
-      subscription.add(actionsSubscription);
-    };
-    log(`starting ${name}`);
-    start();
+    const results = new Subject();
+    const actions = new ActionsObservable(actionsProxy);
+    const actionsSubscription = _actions.subscribe(actionsProxy);
+    const epicsSubscription = userEpic(actions, ...rest)
+      .subscribe(
+        action => results.next(action),
+        err => results.error(err),
+        () => {
+          log('epics completed');
+          lifecycle.complete();
+          results.complete();
+        }
+      );
+
+    subscription.add(epicsSubscription);
+    subscription.add(actionsSubscription);
     return results;
   }
-
-  observableEpic.displayName = name;
 
   // private methods/properties
   // used internally by render-to-string
   observableEpic[$$isWrapped] = true;
   observableEpic[$$getObservable] = () => lifecycle;
-  observableEpic[$$end] = () => {
-    log(`ending ${name} actions proxy stream`);
+  observableEpic[$$complete] = () => {
+    log('completing actions stream');
     actionsProxy.next(endAction);
     actionsProxy.complete();
   };
-  observableEpic[$$restart] = () => {
-    log(`restarting ${name}`);
-    observableEpic.unsubscribe();
+  observableEpic[$$unsubscribe] = () => {
+    log('unsubscribing actions and epic');
+    lifecycle.unsubscribe();
+    subscription.unsubscribe();
     actionsProxy.unsubscribe();
-    start();
   };
 
-  // user land unsubscribe
-  observableEpic.unsubscribe = () => subscription.unsubscribe();
   return observableEpic;
 }
