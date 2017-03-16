@@ -2,110 +2,59 @@
 
 This document uses [rtype](https://github.com/ericelliott/rtype) for type signatures.
 
-## createEpic
+## wrapRootEpic
+Wraps your rootEpic in a function that allows `renderToString` to inspect the observables within the epicMiddleware.
 
-Creates an epic middleware to be passed into Redux createStore
+### Type
 
 ```js
-Saga(
-  actions$: Observable[ ...Action ],
-  getState: () => Object,
-  dependencies: Object
-) => Observable[ ...Action|Void ]
-
-interface EpicMiddleware {
-  ({
-    dispatch: Function,
-    getState: Function
-  }) => ( (next: Function) => (action: Action) => Action ),
-  // used to dispose sagas
-  dispose() => Void
-}
-
-interface createEpic {
-  (dependencies: Object, ...sagas: [ Saga... ]) => EpicMiddleware
-  (...sagas: [ Saga... ]) => EpicMiddleware
-}
+interface WrappedEpic { ...Epic };
 ```
-
-## Contain
-
-Creates a [Hgher Order Component (HOC)](https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750#.qoukwp2kc)
-around your React Component. This can be combined with Redux's `connect` HOC.
+### usage
 
 ```js
-interface Options {
-  fetchAction?: ActionCreator,
-  getActionArgs?(props: Object, context: Object) => [ ...Any ],
-  isPrimed?(props: Object, context: Object) => Boolean,
-  shouldRefetch?(
-    props: Object,
-    nextProps: Object,
-    context: Object,
-    nextContext: Object
-  ) => Boolean,
-}
+import { createEpicMiddleware } from 'redux-observable';
+import { wrapRootEpic } from 'react-redux-epic';
+import { fetchDataCompleteActionCreator } from './action-creators.js';
 
-interface contain {
-  (options?: Options, Component: ReactComponent) => ReactComponent
-  (options?: Object) => (Component: ReactComponent) => ReactComponent
-}
-```
-A simple example:
-
-```js
-import React from 'react';
-import { connect } from 'react-redux';
-import { contain } from 'redux-epic';
-
-class ShowUser extends React.Component {
-  render() {
-    const { user = {} } = this.props;
-    return (
-      <h1>UserName: { user.name }</h1>
-    );
-  }
-}
-
-const containComponent = contain({
-  // this is the action we want the
-  // container to call when this component
-  // is going to be mounted
-  fetchAction: 'fetchUser',
-  // these are the arguments to call the action creator
-  getActionArgs(props) {
-    return [ props.params.userId ];
-  }
-});
-
-const connectComponent = connect(
-  state => ({ user: state.user }), //
-  { fetchUser: userId => ({ type: 'FETCH_USER', payload: userId }) }
+const rootEpic = actions => actions.ofType('FETCH').switchMap(() => Observale
+  .ajax('/api/data')
+  .map(fetchDataCompleteActionCreator);
 );
 
-// connect will provide the data from state and the binded actionCreator
-// contain will handle data fetching
-export default connectComponent(containComponent(ShowUser));
+const wrappedEpic = wrapRootEpic(rootEpic);
+const epicMiddleware = createEpicMiddleware(wrappedEpic);
 ```
 
-
-## render-to-string
-
-Used when you want your server-side rendered app to be fully populated.
-
-Ensures all the stores are populated before running React's renderToString internally.
-This will end the actions$ observable and wait for
-all of the sagas to complete.
+## renderToString
+renderToString takes your wrappedEpic and your react app and will trigger a render, wait for all of your epics to complete, then trigger a final render to 
 
 ```js
-renderToString(Component: ReactComponent, epicMiddleware: EpicMiddleware) => Observable[String]
+// typings
+renderToString(
+  element: ReactElement,
+  wrappedEpic: WrappedEpic
+) => Observable[{ markup: String }];
+
+// usage
+
+renderToString(<App />, wrappedEpic)
+	.subscribe(({ markup }) => {
+	  // if using Express
+	  res.render('index', { markup });
+	});
 ```
 
 ## render
 
 
-Optional: Wraps `react-doms` render method in an observable.
+Optional: Wraps `react-dom`'s [render](https://facebook.github.io/react/docs/react-dom.html#render) method in an observable. Calls `next` when the render is complete.
 
 ```js
-render(Component: ReactComponent, DomContainer: DOMNode) => Observable[ RootInstance ]
+render(element: ReactElement, container: DOMElement) => Observable;
+```
+### usage
+```js
+render(<App />, document.getElementById('app-div'))
+  .subscribe(() => console.log('rendered!'));
 ```
