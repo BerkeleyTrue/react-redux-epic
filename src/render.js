@@ -10,10 +10,10 @@ export default function render(element, container) {
   return Observable.create(observer => {
     try {
       _render(element, container, function() {
-        observer.next(this);
+        observer.next();
       });
-    } catch (e) {
-      return observer.error(e);
+    } catch (err) {
+      return observer.error(err);
     }
 
     return () => unmountComponentAtNode(container);
