@@ -3,8 +3,7 @@ import invariant from 'invariant';
 import { EmptyObservable } from 'rxjs/observable/EmptyObservable';
 import { Subject } from 'rxjs/Subject';
 import { Subscriber } from 'rxjs/Subscriber';
-import { EPIC_END } from 'redux-observable/lib/EPIC_END';
-import { ActionsObservable } from 'redux-observable/lib/ActionsObservable.js';
+import { ActionsObservable, EPIC_END } from 'redux-observable';
 import debug from 'debug';
 
 import {
