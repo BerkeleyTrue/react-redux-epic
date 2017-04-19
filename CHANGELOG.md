@@ -1,3 +1,26 @@
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/BerkeleyTrue/react-redux-epic/compare/0.1.0...v0.3.0) (2017-04-19)
+
+
+### Bug Fixes
+
+* **package:** Use same version of Rx as Redux-Observable ([c64704e](https://github.com/BerkeleyTrue/react-redux-epic/commit/c64704e))
+* **render:** `render` observable will no longer return the react instance. ([942192a](https://github.com/BerkeleyTrue/react-redux-epic/commit/942192a))
+* **wrapRoot:** Import RO ActionsObservable/EPIC_END from public interface ([f23df1e](https://github.com/BerkeleyTrue/react-redux-epic/commit/f23df1e))
+
+
+### Features
+
+* **rts:** Wrap initial render pass in obs defer ([adaf4ed](https://github.com/BerkeleyTrue/react-redux-epic/commit/adaf4ed))
+* add's new client entry point ([996245b](https://github.com/BerkeleyTrue/react-redux-epic/commit/996245b))
+
+
+### BREAKING CHANGES
+
+* **render:** render api change
+
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/BerkeleyTrue/react-redux-epic/compare/0.1.0...v0.2.0) (2017-03-17)
 
