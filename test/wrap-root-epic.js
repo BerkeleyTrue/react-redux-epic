@@ -55,9 +55,10 @@ test(
   'wrappedEpic(actions) => results will emit actions',
   t => {
     const wrappedEpic = wrapRootEpic(
-      () => ActionsObservable.of({ type: 'FOO' })
+      actions => actions.mapTo({ type: 'FOO' })
     );
-    return wrappedEpic(ActionsObservable.of({ type: 'BAR' }))
+
+    return wrappedEpic(ActionsObservable.of({ type: 'BAR' }).delay(1))
       .map(action => {
         t.is(action.type, 'FOO');
       });
