@@ -1,3 +1,13 @@
+<a name="0.3.1"></a>
+## [0.3.1](https://github.com/BerkeleyTrue/react-redux-epic/compare/v0.3.0...v0.3.1) (2017-04-25)
+
+
+### Bug Fixes
+
+* **renderToString:** Fix renderToString sync complete/unsubscribe error ([e751665](https://github.com/BerkeleyTrue/react-redux-epic/commit/e751665)), closes [#6](https://github.com/BerkeleyTrue/react-redux-epic/issues/6)
+
+
+
 <a name="0.3.0"></a>
 # [0.3.0](https://github.com/BerkeleyTrue/react-redux-epic/compare/0.1.0...v0.3.0) (2017-04-19)
 
