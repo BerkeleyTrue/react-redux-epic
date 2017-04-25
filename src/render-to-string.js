@@ -45,6 +45,9 @@ export default function renderToString(element, wrappedEpic) {
     return wrappedEpic[$$getObservable]();
   }
   return Observable.defer(initialRender)
+    // allow wrappedEpic[$$complete](); to complete before calling unsubscribe
+    // otherwise this could
+    .delay(0)
     .last(null, null, null)
     .map(() => {
       wrappedEpic[$$unsubscribe]();

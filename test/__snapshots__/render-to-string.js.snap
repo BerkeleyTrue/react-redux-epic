@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renderToString with fetch completes without error 1`] = `
+Object {
+  "markup": "<div data-reactroot=\\"\\" data-reactid=\\"1\\" data-react-checksum=\\"179442080\\">WASSUP!!!</div>",
+}
+`;
+
+exports[`renderToString with fetch completes without error 2`] = `
+Object {
+  "content": "WASSUP!!!",
+}
+`;
