@@ -59,7 +59,7 @@
     "enzyme": "^2.4.1",
     "eslint": "^3.5.0",
     "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-react": "^6.3.0",
+    "eslint-plugin-react": "^7.0.0",
     "nodemon": "^1.11.0",
     "nyc": "^10.1.2",
     "react-addons-test-utils": "^15.3.2",
