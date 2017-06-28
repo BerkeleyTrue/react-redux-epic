@@ -44,7 +44,7 @@
   "author": "Berkeley Martinez <hi@BerkeleyTrue.com> (http://www.BerkeleyTrue.com)",
   "license": "MIT",
   "devDependencies": {
-    "ava": "^0.19.1",
+    "ava": "^0.20.0",
     "babel": "^6.5.2",
     "babel-cli": "^6.14.0",
     "babel-eslint": "^7.2.2",
