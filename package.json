@@ -57,7 +57,7 @@
     "babel-preset-react": "^6.11.1",
     "coveralls": "^2.11.14",
     "cz-conventional-changelog": "^2.0.0",
-    "enzyme": "^2.4.1",
+    "enzyme": "^3.0.0",
     "eslint": "^4.1.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-react": "^7.0.0",
@@ -65,11 +65,11 @@
     "nyc": "^11.0.1",
     "react-addons-test-utils": "^15.3.2",
     "react-redux": "^5.0.4",
-    "sinon": "^3.2.1"
+    "sinon": "^4.0.0"
   },
   "dependencies": {
     "babel-runtime": "^6.11.6",
-    "debug": "^2.2.0",
+    "debug": "^3.1.0",
     "invariant": "^2.2.1",
     "react": "^15.0.0-0 || ^16.0.0-0",
     "react-dom": "^15.0.0-0 || ^16.0.0-0",
