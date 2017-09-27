@@ -1,3 +1,18 @@
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/BerkeleyTrue/react-redux-epic/compare/v0.3.1...v1.0.0) (2017-09-27)
+
+
+### Features
+
+* **packages:** Upgrade to React 16 ([#21](https://github.com/BerkeleyTrue/react-redux-epic/issues/21)) ([7dcdedb](https://github.com/BerkeleyTrue/react-redux-epic/commit/7dcdedb))
+
+
+### BREAKING CHANGES
+
+* **packages:** This version requires major version bumps of several dependencies
+
+
+
 <a name="0.3.1"></a>
 ## [0.3.1](https://github.com/BerkeleyTrue/react-redux-epic/compare/v0.3.0...v0.3.1) (2017-04-25)
 
