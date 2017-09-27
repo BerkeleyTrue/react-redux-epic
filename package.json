@@ -1,6 +1,6 @@
 {
   "name": "react-redux-epic",
-  "version": "1.0.0",
+  "version": "0.3.1",
   "description": "Server side rendering for Redux-Observable",
   "main": "lib",
   "scripts": {
@@ -13,6 +13,7 @@
     "cover:watch": "nodemon --watch test/ --exec 'npm run test && npm run cover'",
     "cover:show": "open coverage/index.html",
     "cover:alls": "nyc report --reporter=text-lcov | coveralls",
+    "prebuild": "npm run test",
     "build": "BABEL_ENV=production babel src --out-dir lib",
     "prepublishOnly": "npm run build"
   },
@@ -76,7 +77,7 @@
     "react-dom": "^16.0.0",
     "redux": "^3.6.0",
     "redux-observable": "^0.16.0",
-    "rxjs": "^5.0.0"
+    "rxjs": "^5.3.0"
   },
   "config": {
     "commitizen": {
