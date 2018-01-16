@@ -2,8 +2,11 @@
 import test from 'ava';
 import sinon from 'sinon';
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, configure } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 import contain from '../src/contain.js';
+
+configure({ adapter: new Adapter() });
 
 test('contain', t => {
   t.is(

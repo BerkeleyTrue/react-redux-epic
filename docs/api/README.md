@@ -19,7 +19,7 @@ import { createEpicMiddleware } from 'redux-observable';
 import { wrapRootEpic } from 'react-redux-epic';
 import { fetchDataCompleteActionCreator } from './action-creators.js';
 
-const rootEpic = actions => actions.ofType('FETCH').switchMap(() => Observale
+const rootEpic = actions => actions.ofType('FETCH').switchMap(() => Observable
   .ajax('/api/data')
   .map(fetchDataCompleteActionCreator);
 );
@@ -29,7 +29,7 @@ const epicMiddleware = createEpicMiddleware(wrappedEpic);
 ```
 
 ## renderToString
-renderToString takes your wrappedEpic and your react app and will trigger a render, wait for all of your epics to complete, then trigger a final render to 
+renderToString takes your wrappedEpic and your react app and will trigger a render, wait for all of your epics to complete, then trigger a final render.
 
 ### Type Signature
 
@@ -41,6 +41,8 @@ renderToString(
 ```
 
 ### Usage
+
+```js
 import { renderToString } from 'react-redux-epic';
 
 renderToString(<App />, wrappedEpic)
@@ -56,6 +58,7 @@ renderToString(<App />, wrappedEpic)
 Optional: Wraps `react-dom`'s [render](https://facebook.github.io/react/docs/react-dom.html#render) method in an observable. Calls `next` when the render is complete.
 
 ### Type Signature
+
 ```js
 render(
   element: ReactElement,
