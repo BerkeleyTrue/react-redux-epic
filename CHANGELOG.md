@@ -1,3 +1,13 @@
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/BerkeleyTrue/react-redux-epic/compare/v1.0.0...v1.1.0) (2018-02-02)
+
+
+### Features
+
+* **package:** Update redux-observable to version 0.17.0 ([89bf3bf](https://github.com/BerkeleyTrue/react-redux-epic/commit/89bf3bf))
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/BerkeleyTrue/react-redux-epic/compare/v0.3.1...v1.0.0) (2017-09-27)
 
