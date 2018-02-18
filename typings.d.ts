@@ -1,4 +1,5 @@
 declare module 'react-redux-epic' {
+  import React from 'react';
   import { Observable } from 'rxjs/Observable';
   import { Epic } from 'redux-observable';
 
