@@ -67,7 +67,7 @@
     "nyc": "^11.0.1",
     "react-redux": "^5.0.4",
     "react-test-renderer": "^16.0.0",
-    "sinon": "^4.0.0"
+    "sinon": "^5.0.0"
   },
   "dependencies": {
     "babel-runtime": "^6.11.6",
