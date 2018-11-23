@@ -1,9 +1,7 @@
-import 'rxjs';
+
 import invariant from 'invariant';
-import { EmptyObservable } from 'rxjs/observable/EmptyObservable';
-import { Subject } from 'rxjs/Subject';
-import { Subscriber } from 'rxjs/Subscriber';
-import { ActionsObservable, EPIC_END } from 'redux-observable';
+import { Subscriber, Subject } from 'rxjs';
+import { ActionsObservable } from 'redux-observable';
 import debug from 'debug';
 
 import {
@@ -13,7 +11,7 @@ import {
   $$unsubscribe
 } from './symbols.js';
 
-const endAction = { type: EPIC_END };
+const endAction = { type: 'EPIC_END' };
 const log = debug('react-redux-epic:wrapped-epic');
 
 export default function wrapRootEpic(userEpic) {
@@ -23,7 +21,7 @@ export default function wrapRootEpic(userEpic) {
     userEpic
   );
   let actionsProxy = new Subject();
-  let lifecycle = EmptyObservable.create();
+  let lifecycle = new Subject();
   let subscription;
   function observableEpic(_actions, ...rest) {
     actionsProxy = new Subject();
@@ -33,7 +31,7 @@ export default function wrapRootEpic(userEpic) {
     const results = new Subject();
     const actions = new ActionsObservable(actionsProxy);
     const actionsSubscription = _actions.subscribe(actionsProxy);
-    const epicsSubscription = userEpic(actions, ...rest)
+    const epicsSubscription = userEpic(...[actions, ...rest])
       .subscribe(
         action => results.next(action),
         err => results.error(err),

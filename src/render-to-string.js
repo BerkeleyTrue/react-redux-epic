@@ -1,9 +1,11 @@
-import 'rxjs';
 import { isValidElement } from 'react';
 import ReactDOM from 'react-dom/server';
 import invariant from 'invariant';
 import debug from 'debug';
-import { Observable } from 'rxjs/Observable';
+
+import { defer, throwError } from 'rxjs';
+import { delay, last, map } from 'rxjs/operators';
+
 
 import {
   $$complete,
@@ -11,6 +13,7 @@ import {
   $$isWrapped,
   $$unsubscribe
 } from './symbols.js';
+
 
 const log = debug('react-redux-epic:render-to-string');
 
@@ -32,27 +35,29 @@ export default function renderToString(element, wrappedEpic) {
       Make sure you wrap your root epic
       'const wrappedEpic = wrapRootEpic(rootEpic);'
       and use this wrapped epic in your createEpicMiddleware call
-      'const epicMiddleware = createEpicMiddleware(wrappedEpic);'
+      'const epicMiddleware = createEpicMiddleware();'
+      'epicMiddleware.run(wrappedEpic);'
       Happy Coding.`
     );
     try {
       log('first app render');
       ReactDOM.renderToStaticMarkup(element);
     } catch (e) {
-      return Observable.throw(e);
+      return throwError(e);
     }
     wrappedEpic[$$complete]();
     return wrappedEpic[$$getObservable]();
   }
-  return Observable.defer(initialRender)
+  return defer(initialRender).pipe(
     // allow wrappedEpic[$$complete](); to complete before calling unsubscribe
     // otherwise this could
-    .delay(0)
-    .last(null, null, null)
-    .map(() => {
+    delay(0),
+    last(null, null, null),
+    map(() => {
       wrappedEpic[$$unsubscribe]();
       log('final app render');
       const markup = ReactDOM.renderToString(element);
       return { markup };
-    });
+    })
+  );
 }

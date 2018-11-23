@@ -1,5 +1,5 @@
 import { createElement, PureComponent } from 'react';
-import { isFunction } from 'rxjs/util/isFunction';
+
 import debug from 'debug';
 import invariant from 'invariant';
 
@@ -31,6 +31,8 @@ import invariant from 'invariant';
 
 
 const log = debug('redux-epic:contain');
+
+const isFunction = x => typeof x === 'function';
 
 export default function contain(options = {}) {
   return Component => {

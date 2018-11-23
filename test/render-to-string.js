@@ -3,12 +3,25 @@
 import test from 'ava';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider, connect } from 'react-redux';
-import { createEpicMiddleware } from 'redux-observable';
-import { Observable } from 'rxjs';
-import { $$observable } from 'rxjs/symbol/observable';
+import { createEpicMiddleware, ofType } from 'redux-observable';
+import {
+  observable as $$observable,
+  interval,
+  empty,
+  of
+} from 'rxjs';
 import { Component, createElement } from 'react';
 
 import { renderToString, wrapRootEpic } from '../src';
+import {
+  catchError,
+  tap,
+  last,
+  mapTo,
+  takeUntil,
+  switchMap,
+  delay
+} from 'rxjs/operators';
 
 test('renderToString', t => {
   t.is(
@@ -30,16 +43,17 @@ test('renderToString(element, wrappedEpic) => Observable',
 
 test('renderToString() => Observable[Error]',
   t => {
-    return renderToString()
-      .catch(
+    return renderToString().pipe(
+      catchError(
         err => {
           t.regex(
             err.message,
             /renderToString expects a valid react element/
           );
-          return Observable.empty();
+          return empty();
         }
-      );
+      )
+    );
   }
 );
 
@@ -47,14 +61,15 @@ test(
   'renderToString(ReactElement) => Observable[Error]',
   t => {
     const element = createElement('div', null, 'hello world');
-    return renderToString(element)
-      .catch(err => {
+    return renderToString(element).pipe(
+      catchError(err => {
         t.regex(
           err.message,
           /renderToString expects a wrapped root epic/
         );
-        return Observable.empty();
-      });
+        return empty();
+      })
+    );
   }
 );
 
@@ -62,34 +77,39 @@ test(
   'renderToString(ReactElement, () => {}) => Observable[Error]',
   t => {
     const element = createElement('div', null, 'hello world');
-    return renderToString(element, (actions) => actions.ofType('FOO'))
-      .catch(err => {
+    return renderToString(element, (actions) => actions.ofType('FOO')).pipe(
+      catchError(err => {
         t.regex(
           err.message,
           /renderToString expects a wrapped root epic/
         );
-        return Observable.empty();
-      });
+        return empty();
+      })
+    );
   }
 );
 
 test('renderToString(element, wrappedEpic) completes',
   t => {
     const element = createElement('div', null, 'hello world');
-    const wrappedEpic = wrapRootEpic(actions => Observable
-      .interval(1000)
-      .mapTo({ type: 'FOO' })
-      .takeUntil(actions.last())
+    const wrappedEpic = wrapRootEpic(actions => interval(1000)
+      .pipe(
+        mapTo({ type: 'FOO' }),
+        takeUntil(actions.pipe(last()))
+      )
     );
+    const epicMiddleware = createEpicMiddleware();
     createStore(
       x => x,
-      applyMiddleware(createEpicMiddleware(wrappedEpic))
+      applyMiddleware(epicMiddleware)
     );
-    return renderToString(element, wrappedEpic)
-      .do(({ markup }) => {
+    epicMiddleware.run(wrappedEpic);
+    return renderToString(element, wrappedEpic).pipe(
+      tap(({ markup }) => {
         t.is(typeof markup, 'string');
-      })
-      .last();
+      }),
+      last()
+    );
   }
 );
 
@@ -105,23 +125,32 @@ test(
       }
     }
     const element = createElement(Thrower);
-    const wrappedEpic = wrapRootEpic(actions => Observable
-      .interval(1000)
-      .mapTo({ type: 'FOO' })
-      .takeUntil(actions.last())
+    const wrappedEpic = wrapRootEpic(
+      actions => interval(1000).pipe(
+        mapTo({ type: 'FOO' }),
+        takeUntil(actions.pipe(last())),
+      )
     );
+
+    const epicMiddleware = createEpicMiddleware();
+
     createStore(
       x => x,
-      applyMiddleware(createEpicMiddleware(wrappedEpic))
+      applyMiddleware(epicMiddleware)
     );
+
+    epicMiddleware.run(wrappedEpic);
+
     return renderToString(element, wrappedEpic)
-      .catch(err => {
-        t.regex(
-          err.message,
-          /Thrower throws/
-        );
-        return Observable.empty();
-      });
+      .pipe(
+        catchError(err => {
+          t.regex(
+            err.message,
+            /Thrower throws/
+          );
+          return empty();
+        })
+      );
   }
 );
 
@@ -140,12 +169,13 @@ test('renderToString with fetch completes without error',
         );
       }
     }
-    const rootEpic = actions => actions.ofType('FETCH')
-      .switchMap(() => Observable.of({
-          type: 'FETCH_COMPLETE',
-          payload: 'WASSUP!!!'
-        })
-        .delay(1000)
+    const rootEpic = actions => actions.pipe(
+      ofType('FETCH'),
+      switchMap(() => of({
+        type: 'FETCH_COMPLETE',
+        payload: 'WASSUP!!!'
+      })),
+      delay(1000)
     );
     function reducer(state = { content: 'fail' }, action) {
       if (action.type === 'FETCH_COMPLETE') {
@@ -156,10 +186,14 @@ test('renderToString with fetch completes without error',
       return state;
     }
     const wrappedEpic = wrapRootEpic(rootEpic);
+    const epicMiddleware = createEpicMiddleware();
+
     const store = createStore(
       reducer,
-      applyMiddleware(createEpicMiddleware(wrappedEpic))
+      applyMiddleware(epicMiddleware)
     );
+
+    epicMiddleware.run(wrappedEpic);
     const element = createElement(
       Provider,
       { store },
@@ -169,12 +203,14 @@ test('renderToString with fetch completes without error',
       )
     );
     return renderToString(element, wrappedEpic)
-      .do(({ markup }) => {
-        t.is(typeof markup, 'string');
-        t.notRegex(markup, /fail/);
-        t.regex(markup, /wassup/i);
-        t.snapshot({ markup });
-        t.snapshot(store.getState());
-      });
+      .pipe(
+        tap(({ markup }) => {
+          t.is(typeof markup, 'string');
+          t.notRegex(markup, /fail/);
+          t.regex(markup, /wassup/i);
+          t.snapshot({ markup });
+          t.snapshot(store.getState());
+        })
+      );
   }
 );

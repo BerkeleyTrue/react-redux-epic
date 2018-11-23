@@ -1,5 +1,5 @@
 import { render as _render, unmountComponentAtNode } from 'react-dom';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 
 // render(
 //   element: ReactElement,
