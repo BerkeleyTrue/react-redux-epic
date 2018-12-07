@@ -17,6 +17,7 @@ interface WrappedEpic { ...Epic };
 ```js
 import { createEpicMiddleware } from 'redux-observable';
 import { wrapRootEpic } from 'react-redux-epic';
+import { createStore  } from 'redux';
 import { fetchDataCompleteActionCreator } from './action-creators.js';
 
 const rootEpic = actions => actions.ofType('FETCH').switchMap(() => Observable
@@ -25,7 +26,16 @@ const rootEpic = actions => actions.ofType('FETCH').switchMap(() => Observable
 );
 
 const wrappedEpic = wrapRootEpic(rootEpic);
-const epicMiddleware = createEpicMiddleware(wrappedEpic);
+
+// Create the epic middleware. 
+// See https://redux-observable.js.org/docs/basics/SettingUpTheMiddleware.html for more details
+const epicMiddleware = createEpicMiddleware();
+
+// Create the redux store as usual
+const store = createStore(...);
+
+// Attach the wrapped epic to the middleware
+epicMiddleware.run(wrappedEpic);
 ```
 
 ## renderToString
